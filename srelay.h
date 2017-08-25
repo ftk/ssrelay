@@ -1,6 +1,6 @@
 /*
   srelay.h:
-  $Id: srelay.h,v 1.32 2017/08/16 13:00:01 bulkstream Exp $
+  $Id: srelay.h,v 1.33 2017/08/25 05:53:27 bulkstream Exp $
          common definitions.
 
 Copyright (C) 2001-2010 Tomo.M (author).
@@ -103,7 +103,7 @@ typedef    u_int32_t    socklen_t;
 # endif
 #endif
 
-#define version  "srelay 0.4.8b6 2013/03/11 (Tomo.M)"
+#define version  "srelay 0.4.8b8 2017/08/25 (Tomo.M)"
 
 #ifndef SYSCONFDIR
 # define SYSCONFDIR "/usr/local/etc"
@@ -385,6 +385,7 @@ extern char *config;
 extern char *ident;
 extern char *pidfile;
 extern char *pwdfile;
+extern char *localpwd;
 extern char *bindtodevice;
 extern int max_child;
 extern int cur_child;
