@@ -1,6 +1,6 @@
 /*
   srelay.h:
-  $Id: srelay.h,v 1.35 2017/09/01 07:04:50 bulkstream Exp $
+  $Id: srelay.h,v 1.36 2017/09/01 08:39:12 bulkstream Exp $
          common definitions.
 
 Copyright (C) 2001-2010 Tomo.M (author).
@@ -103,7 +103,7 @@ typedef    u_int32_t    socklen_t;
 # endif
 #endif
 
-#define version  "srelay 0.4.8b8 2017/08/25 (Tomo.M)"
+#define version  "srelay 0.4.8 2017/09/01 (Tomo.M)"
 
 #ifndef SYSCONFDIR
 # define SYSCONFDIR "/usr/local/etc"
