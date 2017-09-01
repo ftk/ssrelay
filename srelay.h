@@ -1,6 +1,6 @@
 /*
   srelay.h:
-  $Id: srelay.h,v 1.33 2017/08/25 05:53:27 bulkstream Exp $
+  $Id: srelay.h,v 1.35 2017/09/01 07:04:50 bulkstream Exp $
          common definitions.
 
 Copyright (C) 2001-2010 Tomo.M (author).
@@ -197,6 +197,11 @@ extern int threading;
 
 enum { norm=0, warn, crit };
 
+#define DEBUG(level, ...)           \
+  do {                      \
+    if (verbosity >= (level))       \
+        msg_out(norm, __VA_ARGS__); \
+  } while(0);
 
 /*
  *  SOCKS protocol related definitions
@@ -399,6 +404,7 @@ extern int use_tcpwrap;
 #endif /* HAVE_LIBWRAP */
 extern int fg;		/* foreground operation */
 extern int inetd_mode;  /* inetd mode */
+extern int verbosity;   /* logging verbosity */
 
 /* from init.c */
 extern char **str_serv_sock;

@@ -1,6 +1,6 @@
 /*
   auth-pwd.c
-  $Id: auth-pwd.c,v 1.15 2017/08/25 05:53:27 bulkstream Exp $
+  $Id: auth-pwd.c,v 1.16 2017/09/01 05:59:24 bulkstream Exp $
 
 Copyright (C) 2001-2010 Tomo.M (author).
 All rights reserved.
