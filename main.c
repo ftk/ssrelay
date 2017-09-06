@@ -1,6 +1,6 @@
 /*
   main.c:
-  $Id: main.c,v 1.27 2017/09/01 07:04:50 bulkstream Exp $
+  $Id: main.c,v 1.28 2017/09/06 09:41:19 bulkstream Exp $
 
 Copyright (C) 2001-2010 Tomo.M (author).
 All rights reserved.
@@ -676,7 +676,9 @@ int main(int ac, char **av)
   }
 
   setsignal(SIGHUP, reload);
+  if (!isatty(fileno(stdin))) {
   setsignal(SIGINT, SIG_IGN);
+  }
   setsignal(SIGQUIT, SIG_IGN);
   setsignal(SIGILL, SIG_IGN);
   setsignal(SIGTRAP, SIG_IGN);
