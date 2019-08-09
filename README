@@ -1,3 +1,11 @@
+ssrelay -- SOCKS proxy with the abitiliy to split the first outgoing TCP packet to trick DPI censorship. (srelay fork)
+
+Example:
+	./srelay -i 127.0.0.1:1080 -x 3
+Also, if you have a non-routed interface connected to a VPN, you can use srelay to route traffic via it:
+	./srelay -q -i <local ip>:1080 -J tun0
+
+
 
 srelay	-- SOCKS protocol server with proxy chaining capability.
 									2017/09/01 Tomo.M
