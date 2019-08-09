@@ -73,6 +73,7 @@ int cur_child;
 int fg;        /* foreground operation */
 int inetd_mode = 0;  /* inetd mode */
 int bind_restrict = 1; /* socks bind port is restricted */
+int split_pos = 0; /* split position */
 
 /* authentication method priority table */
 int method_num;
@@ -112,6 +113,7 @@ void usage()
 	  "\t-w\tuse tcp_wrapper access control\n"
 #endif /* HAVE_LIBWRAP */
 	  "\t-I\tinetd mode\n"
+	  "\t-x\tsplit first outgoing tcp packet at n-th byte\n"
 	  "\t-q\twill be quiet\n"
 	  "\t-v\tincrease verbosity\n"
 	  "\t-V\tshow version and exit\n"
@@ -475,7 +477,7 @@ int main(int ac, char **av)
 
   openlog(ident, LOG_PID | LOG_NDELAY, SYSLOGFAC);
 
-  while((ch = getopt(ac, av, "a:c:i:J:m:o:p:u:U:frstbwgIqvVh?")) != -1) {
+  while((ch = getopt(ac, av, "a:c:i:J:m:o:p:u:U:x:frstbwgIqvVh?")) != -1) {
     switch (ch) {
     case 'a':
       if (optarg != NULL) {
@@ -593,6 +595,10 @@ int main(int ac, char **av)
 
     case 'I':
       inetd_mode = 1;
+      break;
+
+    case 'x':
+      split_pos = atoi(optarg);
       break;
 
     case 'q':

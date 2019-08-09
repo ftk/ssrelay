@@ -51,11 +51,12 @@ typedef struct {
 enum { UP, DOWN };		/* udp relay direction */
 
 int resolv_client;
+extern int split_pos;
 
 /* proto types */
 void readn	 __P((rlyinfo *));
-void writen	 __P((rlyinfo *));
-ssize_t forward	 __P((rlyinfo *));
+void writen	 __P((rlyinfo *,int));
+ssize_t forward	 __P((rlyinfo *,int));
 ssize_t forward_udp __P((rlyinfo *, UDP_ATTR *, int));
 int decode_socks_udp __P((UDP_ATTR *, u_char *));
 void relay_tcp __P((SOCKS_STATE *));
@@ -72,23 +73,36 @@ void readn(rlyinfo *ri)
   }
 }
 
-void writen(rlyinfo *ri)
+void writen(rlyinfo *ri, int split)
 {
   ri->nwritten = 0;
-  ri->nwritten = sendto(ri->to, ri->buf+ri->top, ri->nw, ri->flags,
-			ri->ss, ri->len);
+  if(split && ri->nw > split) {
+    ri->nwritten = sendto(ri->to, ri->buf+ri->top, split, ri->flags,
+                          ri->ss, ri->len);
+    if(ri->nwritten == split) {
+      ri->nwritten = sendto(ri->to, ri->buf+ri->top+split, ri->nw-split, ri->flags,
+                            ri->ss, ri->len);
+      if(ri->nwritten >= 0) {
+        ri->nwritten += split;
+      }
+    }
+
+  } else {
+    ri->nwritten = sendto(ri->to, ri->buf+ri->top, ri->nw, ri->flags,
+                          ri->ss, ri->len);
+  }
   if (ri->nwritten <= 0) {
     msg_out(warn, "write: %m");
   }
 }
 
-ssize_t forward(rlyinfo *ri)
+ssize_t forward(rlyinfo *ri, int split)
 {
   settimer(TIMEOUTSEC);
   readn(ri);
   if (ri->nread > 0) {
     ri->nw = ri->nread;
-    writen(ri);
+    writen(ri, split);
   }
   settimer(0);
   if (ri->nread == 0)
@@ -160,7 +174,7 @@ ssize_t forward_udp(rlyinfo *ri, UDP_ATTR *udp, int method)
       }
       break;
     }
-    writen(ri);
+    writen(ri,0);
   } else {
     /* PROXY just relay */
     /* XXXXX  not yet */
@@ -316,7 +330,7 @@ void relay_tcp(SOCKS_STATE *state)
     if (sfd > 0) {
       if (FD_ISSET(state->r, &rfds)) {
 	ri.from = state->r; ri.to = state->s; ri.flags = 0;
-	if ((wc = forward(&ri)) <= 0)
+	if ((wc = forward(&ri,0)) <= 0)
 	  done++;
 	else {
 	  li.bc += wc; li.dnl += wc;
@@ -325,7 +339,7 @@ void relay_tcp(SOCKS_STATE *state)
       }
       if (FD_ISSET(state->r, &xfds)) {
 	ri.from = state->r; ri.to = state->s; ri.flags = MSG_OOB;
-	if ((wc = forward(&ri)) <= 0)
+	if ((wc = forward(&ri,0)) <= 0)
 	  done++;
 	else {
 	  li.bc += wc; li.dnl += wc;
@@ -334,7 +348,7 @@ void relay_tcp(SOCKS_STATE *state)
       }
       if (FD_ISSET(state->s, &rfds)) {
 	ri.from = state->s; ri.to = state->r; ri.flags = 0;
-	if ((wc = forward(&ri)) <= 0)
+	if ((wc = forward(&ri, li.upl ? 0 : split_pos)) <= 0)
 	  done++;
 	else {
 	  li.bc += wc; li.upl += wc;
@@ -343,7 +357,7 @@ void relay_tcp(SOCKS_STATE *state)
       }
       if (FD_ISSET(state->s, &xfds)) {
 	ri.from = state->s; ri.to = state->r; ri.flags = MSG_OOB;
-	if ((wc = forward(&ri)) <= 0)
+	if ((wc = forward(&ri, li.upl ? 0 : split_pos)) <= 0)
 	  done++;
 	else {
 	  li.bc += wc; li.upl += wc;
@@ -440,13 +454,13 @@ void relay_udp(SOCKS_STATE *state)
       */
       if (FD_ISSET(state->s, &rfds)) {
 	ri.from = state->s; ri.to = state->r; ri.flags = 0;
-	if ((wc = forward(&ri)) <= 0)
+	if ((wc = forward(&ri,0)) <= 0)
 	  done++;
 	FD_CLR(state->s, &rfds);
       }
       if (FD_ISSET(state->r >= 0 && state->r, &rfds)) {
 	ri.from = state->r; ri.to = state->s; ri.flags = 0;
-	if ((wc = forward(&ri)) <= 0)
+	if ((wc = forward(&ri,0)) <= 0)
 	  done++;
 	FD_CLR(state->r, &rfds);
       }
